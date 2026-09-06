@@ -89,16 +89,19 @@ async function openBrowserAttached(log) {
   const endpoint = `http://127.0.0.1:${DEBUG_PORT}`;
   const start = Date.now();
   let browser;
+  let lastErr;
   while (Date.now() - start < 20000) {
     try {
-      browser = await chromium.connectOverCDP(endpoint);
+      browser = await chromium.connectOverCDP(endpoint, { timeout: 2000 });
       break;
     } catch (err) {
+      lastErr = err;
       await sleep(500);
     }
   }
   if (!browser) {
-    throw new Error('Não consegui conectar ao Chrome principal. Feche todas as janelas do Chrome e tente de novo.');
+    log(`Detalhe técnico: ${lastErr && lastErr.message}`, 'warn');
+    throw new Error('Não consegui conectar ao Chrome principal. Feche todas as janelas do Chrome (confira o Gerenciador de Tarefas por processos "chrome.exe" escondidos) e tente de novo.');
   }
   const context = browser.contexts()[0] || (await browser.newContext());
   const page = context.pages()[0] || (await context.newPage());
