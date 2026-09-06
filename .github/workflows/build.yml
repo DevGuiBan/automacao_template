@@ -24,6 +24,11 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: '0'
 
+      - name: Download Chromium for Playwright
+        run: npx playwright install chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: '0'
+
       - name: Build installer
         run: npm run dist
         env:
