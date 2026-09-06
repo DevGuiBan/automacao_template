@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>VSFY Template Automation</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Automação de Templates Meta — VSFY</h1>
+    <p class="subtitle">Preenche e envia templates para análise no painel painel.vsfy.pro</p>
+  </header>
+
+  <main>
+    <section class="card" id="step-login">
+      <h2>1. Login</h2>
+      <label class="checkbox-row">
+        <input type="radio" name="login-mode" value="isolated" checked />
+        Perfil separado do app (faça login uma vez; fica salvo para as próximas execuções)
+      </label>
+      <label class="checkbox-row">
+        <input type="radio" name="login-mode" value="attach" />
+        Usar meu Chrome principal, já logado (feche todas as janelas do Chrome antes de clicar — só funciona rodando no seu próprio computador)
+      </label>
+      <button id="btn-open-browser">Abrir navegador e entrar no VSFY</button>
+      <p id="login-status" class="status">Navegador ainda não aberto.</p>
+    </section>
+
+    <section class="card" id="step-config">
+      <h2>2. Templates a criar</h2>
+      <div class="row">
+        <label for="qtd">Quantos templates?</label>
+        <input type="number" id="qtd" min="1" max="50" value="1" />
+        <button id="btn-gerar">Gerar campos</button>
+      </div>
+      <div id="templates-container"></div>
+    </section>
+
+    <section class="card" id="step-run">
+      <h2>3. Executar</h2>
+      <label class="checkbox-row">
+        <input type="checkbox" id="pausar" checked />
+        Revisar cada template antes de enviar (recomendado — você mesmo clica em "Enviar para análise" no navegador)
+      </label>
+      <div class="row">
+        <button id="btn-run" disabled>Iniciar automação</button>
+        <button id="btn-stop" disabled>Parar</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Log</h2>
+      <div id="log" class="log"></div>
+    </section>
+  </main>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "name": "vsfy-template-automation",
+  "version": "1.0.0",
+  "description": "Automação para criar templates Meta em lote no painel VSFY",
+  "main": "main.js",
+  "author": "guibandeira.dev@gmail.com",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac"
+  },
+  "dependencies": {
+    "playwright": "^1.48.2"
+  },
+  "devDependencies": {
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "pro.vsfy.templateautomation",
+    "productName": "VSFY Template Automation",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "automation/**/*",
+      "node_modules/**"
+    ],
+    "asarUnpack": [
+      "node_modules/playwright/**",
+      "node_modules/playwright-core/**"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.business"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
