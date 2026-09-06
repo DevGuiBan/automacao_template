@@ -1,14 +1,11 @@
 'use strict';
 
 const { chromium } = require('playwright-core');
-const { spawn, execSync } = require('child_process');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 
 const BASE_URL = 'https://painel.vsfy.pro';
 const TEMPLATES_URL = `${BASE_URL}/supervisor/templates`;
-const DEBUG_PORT = 9333;
 
 const NAME_PLACEHOLDER = /promo_credito_01/i;
 const HEADER_PLACEHOLDER = /Atualiza[cç][aã]o da sua margem/i;
@@ -40,74 +37,20 @@ function findChromeExecutable() {
   return candidates.find((p) => { try { return fs.existsSync(p); } catch { return false; } }) || null;
 }
 
-function defaultChromeUserDataDir() {
-  if (process.platform === 'win32') {
-    return path.join(process.env['LOCALAPPDATA'] || '', 'Google', 'Chrome', 'User Data');
-  }
-  if (process.platform === 'darwin') {
-    return path.join(os.homedir(), 'Library', 'Application Support', 'Google', 'Chrome');
-  }
-  return path.join(os.homedir(), '.config', 'google-chrome');
-}
-
-function isChromeRunning() {
-  try {
-    if (process.platform === 'win32') {
-      const out = execSync('tasklist /FI "IMAGENAME eq chrome.exe"').toString();
-      return /chrome\.exe/i.test(out);
-    }
-    const out = execSync('pgrep -x "Google Chrome" 2>/dev/null || true').toString();
-    return out.trim().length > 0;
-  } catch {
-    return false;
-  }
-}
-
-async function openBrowserAttached(log) {
-  const chromePath = findChromeExecutable();
-  if (!chromePath) {
+async function openBrowser(userDataDir, log) {
+  if (!findChromeExecutable()) {
     throw new Error('Não encontrei o Google Chrome instalado neste computador. Instale o Chrome para usar esta automação.');
   }
-  if (isChromeRunning()) {
-    throw new Error('Feche TODAS as janelas do Chrome primeiro (preciso iniciá-lo com uma opção especial de depuração) e tente de novo.');
-  }
-  log('Abrindo o seu Chrome principal com depuração remota...');
-  const userDataDir = defaultChromeUserDataDir();
-  const child = spawn(
-    chromePath,
-    [
-      `--remote-debugging-port=${DEBUG_PORT}`,
-      '--remote-allow-origins=*',
-      `--user-data-dir=${userDataDir}`,
-      '--no-first-run',
-      '--no-default-browser-check',
-    ],
-    { detached: true, stdio: 'ignore' }
-  );
-  child.unref();
-
-  const endpoint = `http://127.0.0.1:${DEBUG_PORT}`;
-  const start = Date.now();
-  let browser;
-  let lastErr;
-  while (Date.now() - start < 20000) {
-    try {
-      browser = await chromium.connectOverCDP(endpoint, { timeout: 2000 });
-      break;
-    } catch (err) {
-      lastErr = err;
-      await sleep(500);
-    }
-  }
-  if (!browser) {
-    log(`Detalhe técnico: ${lastErr && lastErr.message}`, 'warn');
-    throw new Error('Não consegui conectar ao Chrome principal. Feche todas as janelas do Chrome (confira o Gerenciador de Tarefas por processos "chrome.exe" escondidos) e tente de novo.');
-  }
-  const context = browser.contexts()[0] || (await browser.newContext());
+  log('Abrindo o navegador (usa seu Chrome instalado, com um perfil próprio do app)...');
+  const context = await chromium.launchPersistentContext(userDataDir, {
+    channel: 'chrome',
+    headless: false,
+    viewport: { width: 1400, height: 900 },
+  });
   const page = context.pages()[0] || (await context.newPage());
   await page.goto(TEMPLATES_URL, { waitUntil: 'domcontentloaded' }).catch(() => {});
-  log('Conectado ao seu Chrome principal.');
-  return { context, page, browser };
+  log('Navegador aberto. Se for a primeira vez, faça login manualmente na aba que abriu — nas próximas vezes a sessão já estará salva.');
+  return { context, page };
 }
 
 async function waitForLogin(page, log, shouldStop) {
@@ -264,7 +207,7 @@ async function runAll(page, templates, opts, log, shouldStop) {
 }
 
 module.exports = {
-  openBrowserAttached,
+  openBrowser,
   waitForLogin,
   runAll,
   // exported for manual/dev testing:

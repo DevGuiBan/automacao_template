@@ -5,8 +5,8 @@ const path = require('path');
 const runner = require('./automation/runner');
 
 let mainWindow;
+let browserContext = null;
 let browserPage = null;
-let browserHandle = null; // CDP browser object returned by connectOverCDP
 let stopRequested = false;
 
 function sendLog(message, level = 'info') {
@@ -31,16 +31,16 @@ function createWindow() {
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', async () => {
-  // Only disconnect — never close the user's real Chrome/context.
-  if (browserHandle) await browserHandle.close().catch(() => {});
+  if (browserContext) await browserContext.close().catch(() => {});
   if (process.platform !== 'darwin') app.quit();
 });
 
 ipcMain.handle('open-browser', async () => {
   try {
-    const { page, browser } = await runner.openBrowserAttached(sendLog);
+    const userDataDir = path.join(app.getPath('userData'), 'vsfy-browser-profile');
+    const { context, page } = await runner.openBrowser(userDataDir, sendLog);
+    browserContext = context;
     browserPage = page;
-    browserHandle = browser;
 
     // Detect login asynchronously so the UI doesn't block.
     runner
