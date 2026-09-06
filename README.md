@@ -2,11 +2,12 @@
 
 App desktop (Windows/Mac) que automatiza o preenchimento e envio de templates Meta no painel [painel.vsfy.pro](https://painel.vsfy.pro/supervisor/templates).
 
-Ele abre um Chrome de verdade, você faz login manualmente (o app detecta sozinho), e depois preenche/envia os templates que você configurar na tela.
+Ele conecta no seu próprio Google Chrome (o mesmo que você já usa, com sua sessão já logada) e preenche/envia os templates que você configurar na tela.
 
 ## Requisitos
 
-- Google Chrome instalado (o app controla o Chrome que já está no seu computador, não baixa um navegador extra).
+- Google Chrome instalado (o app não baixa nem empacota nenhum navegador — ele controla o Chrome que já está no seu computador).
+- Antes de abrir o app, feche todas as janelas do Chrome (ele precisa reabri-lo com uma opção especial de depuração remota).
 
 ## Rodando em modo desenvolvimento
 
@@ -28,7 +29,7 @@ npm start
 
 ## Como usar o app
 
-1. Abra o app e clique em **"Abrir navegador e entrar no VSFY"**. Uma janela de Chrome vai abrir na página de templates — faça login manualmente ali (inclusive 2FA se tiver). O app detecta o login automaticamente.
+1. Feche todas as janelas do Chrome. Abra o app e clique em **"Abrir meu Chrome e entrar no VSFY"**. Seu Chrome vai reabrir (com a sua sessão salva) na página de templates. Se a sessão tiver expirado, faça login manualmente ali. O app detecta o login automaticamente.
 2. Defina quantos templates quer criar e clique em **"Gerar campos"**. Preencha cada bloco (nome, corpo da mensagem, rodapé, botões, etc.) — o botão "Copiar do anterior" agiliza quando os templates são parecidos.
 3. Decida se quer manter marcado **"Revisar cada template antes de enviar"**:
    - **Marcado (recomendado)**: o app preenche o formulário e espera você mesmo clicar em "Enviar para análise" no navegador antes de seguir para o próximo. Bom para os primeiros usos.
@@ -38,5 +39,5 @@ npm start
 ## Observações importantes
 
 - O envio de um template é real: ele entra na fila de aprovação do Meta na sua conta. Revise o conteúdo antes de confirmar.
-- O app guarda a sessão do navegador entre execuções (perfil próprio, separado do seu Chrome pessoal), então você não precisa logar toda vez — só quando a sessão expirar.
+- Como o app usa seu perfil real do Chrome, o login fica salvo entre execuções — só é preciso logar de novo quando a sessão expirar.
 - Campo "Departamento": deixe em branco para usar o único/padrão da conta. Se a conta tiver mais de um número/departamento, digite o texto exatamente como aparece no dropdown do site.

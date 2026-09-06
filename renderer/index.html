@@ -14,15 +14,8 @@
   <main>
     <section class="card" id="step-login">
       <h2>1. Login</h2>
-      <label class="checkbox-row">
-        <input type="radio" name="login-mode" value="isolated" checked />
-        Perfil separado do app (faça login uma vez; fica salvo para as próximas execuções)
-      </label>
-      <label class="checkbox-row">
-        <input type="radio" name="login-mode" value="attach" />
-        Usar meu Chrome principal, já logado (feche todas as janelas do Chrome antes de clicar — só funciona rodando no seu próprio computador)
-      </label>
-      <button id="btn-open-browser">Abrir navegador e entrar no VSFY</button>
+      <p>Feche <strong>todas</strong> as janelas do Google Chrome antes de clicar no botão abaixo. O app vai reabrir o seu Chrome (com a sua sessão já logada) e conectar nele.</p>
+      <button id="btn-open-browser">Abrir meu Chrome e entrar no VSFY</button>
       <p id="login-status" class="status">Navegador ainda não aberto.</p>
     </section>
 

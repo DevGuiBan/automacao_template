@@ -1,6 +1,6 @@
 'use strict';
 
-const { chromium } = require('playwright');
+const { chromium } = require('playwright-core');
 const { spawn, execSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
@@ -19,18 +19,6 @@ const CONFIRM_TEXT = /confirmar|continuar|ok\b|sim\b/i;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function openBrowser(userDataDir, log) {
-  log('Abrindo o navegador (Chrome)...');
-  const context = await chromium.launchPersistentContext(userDataDir, {
-    headless: false,
-    viewport: { width: 1400, height: 900 },
-  });
-  const page = context.pages()[0] || (await context.newPage());
-  await page.goto(TEMPLATES_URL, { waitUntil: 'domcontentloaded' }).catch(() => {});
-  log('Navegador aberto. Faça login manualmente na aba que abriu (se necessário).');
-  return { context, page };
 }
 
 function findChromeExecutable() {
@@ -78,7 +66,7 @@ function isChromeRunning() {
 async function openBrowserAttached(log) {
   const chromePath = findChromeExecutable();
   if (!chromePath) {
-    throw new Error('Não encontrei o Chrome instalado neste computador. Use o modo "perfil isolado" em vez disso.');
+    throw new Error('Não encontrei o Google Chrome instalado neste computador. Instale o Chrome para usar esta automação.');
   }
   if (isChromeRunning()) {
     throw new Error('Feche TODAS as janelas do Chrome primeiro (preciso iniciá-lo com uma opção especial de depuração) e tente de novo.');
@@ -109,7 +97,7 @@ async function openBrowserAttached(log) {
     }
   }
   if (!browser) {
-    throw new Error('Não consegui conectar ao Chrome principal. Tente de novo ou use o modo "perfil isolado".');
+    throw new Error('Não consegui conectar ao Chrome principal. Feche todas as janelas do Chrome e tente de novo.');
   }
   const context = browser.contexts()[0] || (await browser.newContext());
   const page = context.pages()[0] || (await context.newPage());
@@ -272,7 +260,6 @@ async function runAll(page, templates, opts, log, shouldStop) {
 }
 
 module.exports = {
-  openBrowser,
   openBrowserAttached,
   waitForLogin,
   runAll,

@@ -13,7 +13,7 @@
     "dist:mac": "electron-builder --mac"
   },
   "dependencies": {
-    "playwright": "^1.48.2"
+    "playwright-core": "^1.63.0"
   },
   "devDependencies": {
     "electron": "^32.2.0",
@@ -30,7 +30,6 @@
       "node_modules/**"
     ],
     "asarUnpack": [
-      "node_modules/playwright/**",
       "node_modules/playwright-core/**"
     ],
     "directories": {

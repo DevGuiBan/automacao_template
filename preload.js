@@ -3,7 +3,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  openBrowser: (mode) => ipcRenderer.invoke('open-browser', { mode }),
+  openBrowser: () => ipcRenderer.invoke('open-browser'),
   runAutomation: (templates, options) => ipcRenderer.invoke('run-automation', { templates, options }),
   stopAutomation: () => ipcRenderer.invoke('stop-automation'),
   onLog: (callback) => ipcRenderer.on('log', (_event, data) => callback(data)),

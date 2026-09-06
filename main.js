@@ -1,18 +1,12 @@
 'use strict';
 
-// Keep the Chromium build Playwright downloads next to the package (node_modules)
-// instead of the OS-level cache, so it travels with the packaged app.
-process.env.PLAYWRIGHT_BROWSERS_PATH = '0';
-
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const runner = require('./automation/runner');
 
 let mainWindow;
-let browserContext = null;
 let browserPage = null;
-let browserHandle = null; // CDP browser object, only set in "attach" mode
-let browserMode = null;
+let browserHandle = null; // CDP browser object returned by connectOverCDP
 let stopRequested = false;
 
 function sendLog(message, level = 'info') {
@@ -37,28 +31,16 @@ function createWindow() {
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', async () => {
-  if (browserMode === 'attach') {
-    // Only disconnect — never close the user's real Chrome/context.
-    if (browserHandle) await browserHandle.close().catch(() => {});
-  } else if (browserContext) {
-    await browserContext.close().catch(() => {});
-  }
+  // Only disconnect — never close the user's real Chrome/context.
+  if (browserHandle) await browserHandle.close().catch(() => {});
   if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.handle('open-browser', async (_event, { mode } = {}) => {
+ipcMain.handle('open-browser', async () => {
   try {
-    let context, page, browser;
-    if (mode === 'attach') {
-      ({ context, page, browser } = await runner.openBrowserAttached(sendLog));
-    } else {
-      const userDataDir = path.join(app.getPath('userData'), 'vsfy-browser-profile');
-      ({ context, page } = await runner.openBrowser(userDataDir, sendLog));
-    }
-    browserContext = context;
+    const { page, browser } = await runner.openBrowserAttached(sendLog);
     browserPage = page;
-    browserHandle = browser || null;
-    browserMode = mode === 'attach' ? 'attach' : 'isolated';
+    browserHandle = browser;
 
     // Detect login asynchronously so the UI doesn't block.
     runner

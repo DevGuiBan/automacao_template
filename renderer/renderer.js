@@ -23,11 +23,10 @@ function updateRunButtonState() {
 }
 
 el('btn-open-browser').addEventListener('click', async () => {
-  const mode = document.querySelector('input[name="login-mode"]:checked').value;
   el('btn-open-browser').disabled = true;
   el('login-status').textContent = 'Abrindo navegador...';
   el('login-status').className = 'status';
-  const res = await window.api.openBrowser(mode);
+  const res = await window.api.openBrowser();
   if (!res.ok) {
     el('login-status').textContent = `Erro: ${res.error}`;
     el('btn-open-browser').disabled = false;
