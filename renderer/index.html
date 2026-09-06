@@ -20,13 +20,46 @@
     </section>
 
     <section class="card" id="step-config">
-      <h2>2. Templates a criar</h2>
-      <div class="row">
-        <label for="qtd">Quantos templates?</label>
+      <h2>2. Template</h2>
+      <div class="field">
+        <label for="qtd">Quantos templates criar com este mesmo conteúdo?</label>
         <input type="number" id="qtd" min="1" max="50" value="1" />
-        <button id="btn-gerar">Gerar campos</button>
+        <p class="hint">Acima de 1, o nome recebe um sufixo automático (_1, _2, ...) para ficar único — o resto do conteúdo é idêntico em todos.</p>
       </div>
-      <div id="templates-container"></div>
+      <div class="template-block">
+        <div class="field">
+          <label>Nome do template (obrigatório — minúsculas, números e "_")</label>
+          <input type="text" data-field="nome" placeholder="ex.: promo_credito_01" />
+        </div>
+        <div class="field">
+          <label>Departamento (opcional — deixe em branco para usar o padrão)</label>
+          <input type="text" data-field="departamento" placeholder="ex.: API (LAISD) - 3193" />
+        </div>
+        <div class="field">
+          <label>Título / Header (opcional)</label>
+          <input type="text" data-field="titulo" placeholder="Ex.: Atualização da sua margem" />
+        </div>
+        <div class="field">
+          <label>Imagem do topo — caminho do arquivo no seu computador (opcional)</label>
+          <input type="text" data-field="imagemPath" placeholder="C:\caminho\para\imagem.png" />
+        </div>
+        <div class="field">
+          <label>Corpo da mensagem (obrigatório — use {{1}}, {{2}}... para variáveis)</label>
+          <textarea data-field="corpo" placeholder="Escreva o texto que o cliente vai receber..."></textarea>
+        </div>
+        <div class="field">
+          <label>Rodapé (opcional)</label>
+          <input type="text" data-field="rodape" placeholder="Ex.: Responda para falar com um consultor" />
+        </div>
+        <div class="field">
+          <label>Botões de resposta rápida (até 3, opcional)</label>
+          <div class="buttons-row">
+            <input type="text" data-field="botao1" placeholder="Botão 1 (ex.: CLIQUE AQUI {{URL}})" />
+            <input type="text" data-field="botao2" placeholder="Botão 2 (ex.: CLIQUE AQUI {{URL}})" />
+            <input type="text" data-field="botao3" placeholder="Botão 3 (ex.: CLIQUE AQUI {{URL}})" />
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="card" id="step-run">

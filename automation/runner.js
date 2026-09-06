@@ -77,6 +77,7 @@ async function openBrowserAttached(log) {
     chromePath,
     [
       `--remote-debugging-port=${DEBUG_PORT}`,
+      '--remote-allow-origins=*',
       `--user-data-dir=${userDataDir}`,
       '--no-first-run',
       '--no-default-browser-check',
