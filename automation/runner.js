@@ -109,7 +109,7 @@ async function fillTemplateForm(page, tpl, log) {
   }
 
   if (tpl.imagemPath) {
-    const imageInput = page.locator('input[type="file"][accept*="webp"]').first();
+    const imageInput = page.locator('label:has-text("Anexar imagem") input[type="file"]').first();
     await imageInput.setInputFiles(tpl.imagemPath);
     log(`Imagem anexada: ${tpl.imagemPath}`);
   }
