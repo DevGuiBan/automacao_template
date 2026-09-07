@@ -43,6 +43,13 @@ window.api.onLoginStatus(({ loggedIn }) => {
   updateRunButtonState();
 });
 
+el('btn-escolher-imagem').addEventListener('click', async () => {
+  const filePath = await window.api.selectImage();
+  if (filePath) {
+    document.querySelector('[data-field="imagemPath"]').value = filePath;
+  }
+});
+
 function readBaseTemplate() {
   const get = (field) => (document.querySelector(`[data-field="${field}"]`) || {}).value || '';
   return {

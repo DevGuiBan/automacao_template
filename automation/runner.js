@@ -18,6 +18,20 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+// Types like a person: clicks the field first, small pause, then keystroke-by-keystroke
+// with a slightly randomized delay per character instead of pasting the whole value at once.
+async function humanType(locator, text, log) {
+  if (!text) return;
+  await locator.click();
+  await sleep(randomBetween(150, 400));
+  await locator.pressSequentially(text, { delay: randomBetween(35, 90) });
+  await sleep(randomBetween(100, 300));
+}
+
 function findChromeExecutable() {
   const candidates = [];
   if (process.platform === 'win32') {
@@ -93,11 +107,14 @@ async function openNewTemplateForm(page, log) {
 
 async function fillTemplateForm(page, tpl, log) {
   const nameInput = page.getByPlaceholder(NAME_PLACEHOLDER);
-  await nameInput.fill(tpl.nome || '');
+  await humanType(nameInput, tpl.nome || '', log);
 
   if (tpl.departamento) {
+    await sleep(randomBetween(200, 500));
     const select = page.locator('select').first();
     try {
+      await select.click();
+      await sleep(randomBetween(150, 350));
       await select.selectOption({ label: tpl.departamento });
     } catch (err) {
       log(`Aviso: não encontrei o departamento "${tpl.departamento}", mantendo o padrão.`, 'warn');
@@ -105,28 +122,32 @@ async function fillTemplateForm(page, tpl, log) {
   }
 
   if (tpl.titulo) {
-    await page.getByPlaceholder(HEADER_PLACEHOLDER).fill(tpl.titulo);
+    await humanType(page.getByPlaceholder(HEADER_PLACEHOLDER), tpl.titulo, log);
   }
 
   if (tpl.imagemPath) {
+    await sleep(randomBetween(200, 500));
     const imageInput = page.locator('label:has-text("Anexar imagem") input[type="file"]').first();
     await imageInput.setInputFiles(tpl.imagemPath);
     log(`Imagem anexada: ${tpl.imagemPath}`);
+    await sleep(randomBetween(300, 600));
   }
 
-  await page.getByPlaceholder(BODY_PLACEHOLDER).fill(tpl.corpo || '');
+  await humanType(page.getByPlaceholder(BODY_PLACEHOLDER), tpl.corpo || '', log);
 
   if (tpl.rodape) {
-    await page.getByPlaceholder(FOOTER_PLACEHOLDER).fill(tpl.rodape);
+    await humanType(page.getByPlaceholder(FOOTER_PLACEHOLDER), tpl.rodape, log);
   }
 
   const botoes = (tpl.botoes || []).filter((b) => b && b.trim());
   for (let i = 0; i < botoes.length && i < 3; i++) {
+    await sleep(randomBetween(250, 550));
     const addBtn = page.getByRole('button', { name: /adicionar bot[aã]o/i });
     await addBtn.click();
+    await sleep(randomBetween(150, 350));
     const buttonInputs = page.getByPlaceholder(BUTTON_PLACEHOLDER);
     const count = await buttonInputs.count();
-    await buttonInputs.nth(count - 1).fill(botoes[i]);
+    await humanType(buttonInputs.nth(count - 1), botoes[i], log);
   }
 }
 

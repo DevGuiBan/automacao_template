@@ -52,6 +52,7 @@ button.danger { background: #c0392b; }
 button.danger:hover:not(:disabled) { background: #e05243; }
 
 .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.row input[type="text"] { flex: 1; min-width: 160px; }
 
 input[type="text"], input[type="number"], textarea, select {
   background: #0b1322;

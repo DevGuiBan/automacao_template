@@ -40,8 +40,11 @@
           <input type="text" data-field="titulo" placeholder="Ex.: Atualização da sua margem" />
         </div>
         <div class="field">
-          <label>Imagem do topo — caminho do arquivo no seu computador (opcional)</label>
-          <input type="text" data-field="imagemPath" placeholder="C:\caminho\para\imagem.png" />
+          <label>Imagem do topo (opcional)</label>
+          <div class="row">
+            <input type="text" data-field="imagemPath" placeholder="Nenhuma imagem selecionada" readonly />
+            <button type="button" class="secondary" id="btn-escolher-imagem">Procurar...</button>
+          </div>
         </div>
         <div class="field">
           <label>Corpo da mensagem (obrigatório — use {{1}}, {{2}}... para variáveis)</label>

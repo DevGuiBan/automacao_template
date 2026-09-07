@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const runner = require('./automation/runner');
 
@@ -78,6 +78,16 @@ ipcMain.handle('run-automation', async (_event, { templates, options }) => {
       }
     });
   return { ok: true };
+});
+
+ipcMain.handle('select-image', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Selecione a imagem do topo',
+    properties: ['openFile'],
+    filters: [{ name: 'Imagens', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+  return result.filePaths[0];
 });
 
 ipcMain.handle('stop-automation', async () => {

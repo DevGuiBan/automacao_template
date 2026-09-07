@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
   openBrowser: () => ipcRenderer.invoke('open-browser'),
+  selectImage: () => ipcRenderer.invoke('select-image'),
   runAutomation: (templates, options) => ipcRenderer.invoke('run-automation', { templates, options }),
   stopAutomation: () => ipcRenderer.invoke('stop-automation'),
   onLog: (callback) => ipcRenderer.on('log', (_event, data) => callback(data)),
