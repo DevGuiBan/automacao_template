@@ -170,8 +170,12 @@ async function submitAndConfirm(page, log) {
 
   // The VSFY IA category check can take a while to respond — give it a generous window
   // so we don't miss the modal and leave it stuck open, blocking the next template.
+  // (isVisible() checks once and returns immediately — waitFor() is what actually polls.)
   const confirmBtn = page.getByRole('button', { name: CONFIRM_TEXT }).last();
-  const appeared = await confirmBtn.isVisible({ timeout: 20000 }).catch(() => false);
+  const appeared = await confirmBtn
+    .waitFor({ state: 'visible', timeout: 20000 })
+    .then(() => true)
+    .catch(() => false);
   if (appeared) {
     log('Modal de confirmação apareceu, confirmando...');
     await confirmBtn.click().catch(() => {});
