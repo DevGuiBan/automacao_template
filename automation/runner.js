@@ -168,13 +168,26 @@ async function submitAndConfirm(page, log) {
   await submitBtn.click();
   log('Cliquei em "Enviar para análise". Verificando se aparece confirmação de categoria...');
 
-  // Give the app a moment to show an AI-category confirmation dialog, if any.
-  await sleep(1500);
+  // The VSFY IA category check can take a while to respond — give it a generous window
+  // so we don't miss the modal and leave it stuck open, blocking the next template.
   const confirmBtn = page.getByRole('button', { name: CONFIRM_TEXT }).last();
-  const appeared = await confirmBtn.isVisible({ timeout: 4000 }).catch(() => false);
+  const appeared = await confirmBtn.isVisible({ timeout: 20000 }).catch(() => false);
   if (appeared) {
     log('Modal de confirmação apareceu, confirmando...');
     await confirmBtn.click().catch(() => {});
+  } else {
+    log('Nenhum modal de confirmação apareceu a tempo.', 'warn');
+  }
+}
+
+// Reload the templates page so a leftover modal/overlay from a failed attempt
+// doesn't block the next template in the batch.
+async function recoverPage(page, log) {
+  try {
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.goto(TEMPLATES_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
+  } catch (err) {
+    log(`Aviso: não consegui recarregar a página antes do próximo template (${err.message}).`, 'warn');
   }
 }
 
@@ -216,11 +229,16 @@ async function runAll(page, templates, opts, log, shouldStop) {
     log(`--- Template ${i + 1}/${templates.length}: ${tpl.nome} ---`);
     try {
       const success = await createOneTemplate(page, tpl, opts, log, shouldStop);
-      if (success) ok++;
-      else fail++;
+      if (success) {
+        ok++;
+      } else {
+        fail++;
+        if (!shouldStop()) await recoverPage(page, log);
+      }
     } catch (err) {
       fail++;
       log(`Erro ao criar "${tpl.nome}": ${err.message}`, 'error');
+      if (!shouldStop()) await recoverPage(page, log);
     }
   }
   log(`Concluído. Sucesso: ${ok}. Falhas/pendentes: ${fail}.`, ok && !fail ? 'success' : 'info');
